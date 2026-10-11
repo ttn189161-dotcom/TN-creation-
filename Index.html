@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-to-Myanmar Language Translator</title>
+    <!-- Tailwind CSS for Modern Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-purple-200 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white shadow-2xl rounded-2xl w-full max-w-3xl p-6 md:p-8">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-indigo-700">🌐 ဘာသာစကားစုံမှ မြန်မာသို့ ဘာသာပြန်ဆိုရေးစက်</h1>
+            <p class="text-gray-500 text-sm mt-1">မည်သည့်ဘာသာစကားဖြင့်မဆို ရေးသားပါ၊ မြန်မာဘာသာသို့ အလွယ်တကူ ပြန်ဆိုပေးပါမည်။</p>
+        </div>
+
+        <!-- Translator Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Source Text Area -->
+            <div class="flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <label for="sourceText" class="font-semibold text-gray-700 text-sm">မူရင်းစာသား (မည်သည့်ဘာသာမဆို)</label>
+                    <button onclick="clearText()" class="text-xs text-red-500 hover:text-red-700">ဖျက်မည်</button>
+                </div>
+                <textarea id="sourceText" rows="6" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none text-gray-700" placeholder="यहाँ पाठ टाइप करें သို့မဟုတ် Type text here..."></textarea>
+            </div>
+
+            <!-- Translated Text Area -->
+            <div class="flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <label for="targetText" class="font-semibold text-gray-700 text-sm">မြန်မာဘာသာပြန်ဆိုချက်</label>
+                    <button onclick="copyText()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">ကူးယူမည် (Copy)</button>
+                </div>
+                <textarea id="targetText" rows="6" readonly class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 resize-none" placeholder="မြန်မာဘာသာပြန်ချက် ဒီနေရာတွင် ပေါ်လာပါမည်..."></textarea>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-6 text-center">
+            <button onclick="translateText()" class="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
+                ဘာသာပြန်မည် (Translate)
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript for Translation Logic -->
+    <script>
+        async function translateText() {
+            const text = document.getElementById('sourceText').value.trim();
+            const targetTextArea = document.getElementById('targetText');
+
+            if (!text) {
+                alert('ကျေးဇူးပြု၍ ဘာသာပြန်လိုသော စာသားကို အရင်ထည့်သွင်းပါ။');
+                return;
+            }
+
+            targetTextArea.value = "ဘာသာပြန်နေပါသည်... ကျေးဇူးပြု၍ ခဏစောင့်ပါ။";
+
+            try {
+                // Using Google Translate free endpoint
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=my&dt=t&q=${encodeURIComponent(text)}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data && data[0]) {
+                    let translated = '';
+                    data[0].forEach(item => {
+                        if (item[0]) translated += item[0];
+                    });
+                    targetTextArea.value = translated;
+                } else {
+                    targetTextArea.value = "ဘာသာပြန်ဆိုရာတွင် အမှားအယွင်းရှိသွားပါသည်။ ထပ်မံကြိုးစားပါ။";
+                }
+            } catch (error) {
+                console.error(error);
+                targetTextArea.value = "အင်တာနက်လိုင်း ချိတ်ဆက်မှု အဆင်မပြေပါ။";
+            }
+        }
+
+        function clearText() {
+            document.getElementById('sourceText').value = '';
+            document.getElementById('targetText').value = '';
+        }
+
+        function copyText() {
+            const targetText = document.getElementById('targetText');
+            if (!targetText.value) return;
+            
+            navigator.clipboard.writeText(targetText.value);
+            alert('ဘာသာပြန်ချက်ကို ကူးယူပြီးပါပြီ!');
+        }
+    </script>
+</body>
+</html>
